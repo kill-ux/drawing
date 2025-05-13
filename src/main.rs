@@ -1,13 +1,14 @@
 mod geometrical_shapes;
 
-use geometrical_shapes as gs;
+use geometrical_shapes::{self as gs, Point};
 use gs::{Displayable, Drawable};
 use raster::{Color, Image};
 
 fn main() {
     let mut image = Image::blank(1000, 1000);
-    gs::Point::new(500, 500).draw(&mut image);
+    // gs::Point::new(500, 500).draw(&mut image);
     // gs::Line::random(image.width, image.height).draw(&mut image);
+    gs::Line::new(&Point::new(500, 500), &Point::new(250, 600)).draw(&mut image);
 
     // gs::Point::random(image.width, image.height).draw(&mut image);
 
@@ -25,7 +26,7 @@ fn main() {
     //     gs::Circle::random(image.width, image.height).draw(&mut image);
     // }
 
-    // raster::save(&image, "image.png").unwrap();
+    raster::save(&image, "image.png").unwrap();
 }
 
 impl Displayable for Image {
