@@ -260,8 +260,8 @@ impl Drawable for Line {
 
         let mut x = x0;
         let mut y = y0;
-        let mut err = if dx > dy { dx } else { -dy } / 2;
-        let mut err_prev;
+        let mut range = if dx > dy { dx } else { -dy } / 2;
+        let mut range_prev;
 
         loop {
             image.display(x, y, self.color.clone());
@@ -269,14 +269,14 @@ impl Drawable for Line {
                 break;
             }
 
-            err_prev = err;
-            if err_prev > -dx {
-                err -= dy;
+            range_prev = range;
+            if range_prev > -dx {
+                range -= dy;
                 x += sx;
             }
 
-            if err_prev < dy {
-                err += dx;
+            if range_prev < dy {
+                range += dx;
                 y += sy;
             }
         }
