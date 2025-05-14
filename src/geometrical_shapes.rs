@@ -228,7 +228,7 @@ impl Drawable for Pentagon {
         let mut last_y =
             ((self.radius as f32) * ang_intial.sin() + self.center.y as f32).round() as i32;
         let color = self.color();
-        for i in 0..5 {
+        for _i in 0..5 {
             deta += 72.0;
             let last_point = Point::new(last_x, last_y);
             let ang = (deta as f64) * std::f64::consts::PI / 180.0;
@@ -264,7 +264,7 @@ impl Cube {
 impl Drawable for Cube {
     fn draw(&self, image: &mut Image) {
         let r = (self.point1.x - self.point2.x).abs()/2;
-        let ang = std::f64::consts::PI/4.0;
+        let _ang = std::f64::consts::PI/4.0;
         let p1 = Point {
             x: self.point1.x,
             y: self.point2.y,
