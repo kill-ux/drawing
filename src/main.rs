@@ -31,8 +31,9 @@ fn main() {
         gs::Circle::random(image.width, image.height).draw(&mut image);
     }
 
-    gs::Pentagon::new(&Point::new(500, 500), 400).draw(&mut image);
-    gs::Circle::new(&Point::new(500, 500), 400).draw(&mut image);
+    for _ in 1..5 {
+        gs::Pentagon::random(image.width, image.height).draw(&mut image);
+    }
 
     raster::save(&image, "image.png").unwrap();
 }
