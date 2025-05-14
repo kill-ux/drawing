@@ -1,12 +1,16 @@
 use rand::prelude::*;
 use raster::{Color, Image};
 
+/// Displayable trait for desplay (x, y) in pixel
 pub trait Displayable {
     fn display(&mut self, x: i32, y: i32, color: Color);
 }
 
+/// Drawable trait for drow and pick random color
 pub trait Drawable {
+    /// draw your sheap
     fn draw(&self, image: &mut Image);
+    /// random color
     fn color(&self) -> Color {
         let mut rng = rand::rng();
         Color::rgb(
