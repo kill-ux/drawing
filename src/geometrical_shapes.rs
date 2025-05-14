@@ -64,11 +64,11 @@ impl Line {
 impl Drawable for Line {
     fn draw(&self, image: &mut Image) {
         let color = self.color();
-        drow_line(self, image, color.clone());
+        draw_line(self, image, color.clone());
     }
 }
 
-fn drow_line(line: &Line, image: &mut Image, color: Color) {
+fn draw_line(line: &Line, image: &mut Image, color: Color) {
     let x0 = line.start.x;
     let y0 = line.start.y;
     let x1 = line.end.x;
@@ -83,7 +83,6 @@ fn drow_line(line: &Line, image: &mut Image, color: Color) {
     let mut y = y0;
     let mut range = if dx > dy { dx } else { -dy } / 2;
     let mut range_prev;
-
     loop {
         image.display(x, y, color.clone());
         if x == x1 && y == y1 {
@@ -122,9 +121,9 @@ impl Triangle {
 impl Drawable for Triangle {
     fn draw(&self, image: &mut Image) {
         let color = self.color();
-        drow_line(&Line::new(&self.p1, &self.p2), image, color.clone());
-        drow_line(&Line::new(&self.p2, &self.p3), image, color.clone());
-        drow_line(&Line::new(&self.p3, &self.p1), image, color.clone());
+        draw_line(&Line::new(&self.p1, &self.p2), image, color.clone());
+        draw_line(&Line::new(&self.p2, &self.p3), image, color.clone());
+        draw_line(&Line::new(&self.p3, &self.p1), image, color.clone());
     }
 }
 
@@ -153,10 +152,10 @@ impl Drawable for Rectangle {
             y: self.point1.y,
         };
         let color = self.color();
-        drow_line(&Line::new(&p1, &self.point2), image, color.clone());
-        drow_line(&Line::new(&self.point2, &p2), image, color.clone());
-        drow_line(&Line::new(&p2, &self.point1), image, color.clone());
-        drow_line(&Line::new(&self.point1, &p1), image, color.clone());
+        draw_line(&Line::new(&p1, &self.point2), image, color.clone());
+        draw_line(&Line::new(&self.point2, &p2), image, color.clone());
+        draw_line(&Line::new(&p2, &self.point1), image, color.clone());
+        draw_line(&Line::new(&self.point1, &p1), image, color.clone());
     }
 }
 
@@ -194,6 +193,54 @@ impl Drawable for Circle {
             let y = ((self.radius as f32) * ang.sin() + (self.center.y as f32)).round() as i32;
             image.display(x, y, color.clone());
             i += inc;
+        }
+    }
+}
+
+pub struct Pentagon {
+    center: Point,
+    radius: i32,
+}
+
+impl Pentagon {
+    pub fn new(p1: &Point, radius: i32) -> Self {
+        Self {
+            center: p1.clone(),
+            radius,
+        }
+    }
+
+    pub fn random(width: i32, height: i32) -> Self {
+        let mut rng = rand::rng();
+        Self::new(
+            &Point::random(width, height),
+            rng.random_range(0..width.min(height)),
+        )
+    }
+}
+
+impl Drawable for Pentagon {
+    fn draw(&self, image: &mut Image) {
+        let mut deta = 54.0;
+        let ang_intial = (deta * std::f64::consts::PI / 180.0) as f32;
+        let mut last_x =
+            ((self.radius as f32) * ang_intial.cos() + self.center.x as f32).round() as i32;
+        let mut last_y =
+            ((self.radius as f32) * ang_intial.sin() + self.center.y as f32).round() as i32;
+        let color = self.color();
+        for i in 0..5 {
+            deta += 72.0;
+            let last_point = Point::new(last_x, last_y);
+            let ang = (deta as f64) * std::f64::consts::PI / 180.0;
+            let x = ((self.radius as f64) * ang.cos() + self.center.x as f64).round() as i32;
+            let y = ((self.radius as f64) * ang.sin() + self.center.y as f64).round() as i32;
+            last_x = x;
+            last_y = y;
+            draw_line(
+                &Line::new(&last_point, &Point::new(x, y)),
+                image,
+                color.clone(),
+            );
         }
     }
 }
