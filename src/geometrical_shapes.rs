@@ -81,7 +81,7 @@ fn draw_line(line: &Line, image: &mut Image, color: Color) {
     let x_inc = (dx as f32 / steps as f32) * sx;
     let y_inc = (dy as f32 / steps as f32) * sy;
 
-    for _ in 0..steps {
+    for _ in 0..=steps {
         image.display(x.round() as i32, y.round() as i32, color.clone());
         x += x_inc;
         y += y_inc;
@@ -224,47 +224,49 @@ impl Drawable for Pentagon {
 
 pub struct Cube {
     point1: Point,
-    point2: Point,
+    side: i32,
 }
 
 impl Cube {
-    pub fn new(p1: &Point, p2: &Point) -> Self {
+    pub fn new(p1: &Point, side: i32) -> Self {
         Self {
             point1: p1.clone(),
-            point2: p2.clone(),
+            side,
         }
     }
 }
 
 impl Drawable for Cube {
     fn draw(&self, image: &mut Image) {
-        let d = ((self.point2.x - self.point1.x).abs()) / 3;
-        let p1: Point = Point {
-            x: self.point1.x,
-            y: self.point2.y,
-        };
-        let p2 = &self.point2;
-        let p3 = Point {
-            x: self.point2.x,
+        let p1 = &self.point1;
+        let p2: Point = Point {
+            x: self.point1.x + self.side,
             y: self.point1.y,
         };
-        let p4 = &self.point1;
-
-        let p5: Point = Point {
-            x: self.point2.x + d,
-            y: self.point2.y - d,
+        let p3: Point = Point {
+            x: self.point1.x + self.side,
+            y: self.point1.y + self.side,
         };
-        let p6 = Point {
+        let p4: Point = Point {
+            x: self.point1.x,
+            y: self.point1.y + self.side,
+        };
+        let d = ((p3.x - p1.x).abs()) / 3;
+        let p1_b = Point {
             x: p1.x + d,
             y: p1.y - d,
         };
-        let p7 = Point {
-            x: self.point1.x + d,
-            y: self.point1.y - d,
+        let p2_b: Point = Point {
+            x: p2.x + d,
+            y: p2.y - d,
         };
-        let p8 = Point {
+        let p3_b: Point = Point {
             x: p3.x + d,
             y: p3.y - d,
+        };
+        let p4_b: Point = Point {
+            x: p4.x + d,
+            y: p4.y - d,
         };
 
         let color = self.color();
@@ -273,14 +275,14 @@ impl Drawable for Cube {
         draw_line(&Line::new(&p3, &p4), image, color.clone());
         draw_line(&Line::new(&p4, &p1), image, color.clone());
 
-        draw_line(&Line::new(&p5, &p6), image, color.clone());
-        draw_line(&Line::new(&p6, &p7), image, color.clone());
-        draw_line(&Line::new(&p7, &p8), image, color.clone());
-        draw_line(&Line::new(&p8, &p5), image, color.clone());
+        draw_line(&Line::new(&p1_b, &p2_b), image, color.clone());
+        draw_line(&Line::new(&p2_b, &p3_b), image, color.clone());
+        draw_line(&Line::new(&p3_b, &p4_b), image, color.clone());
+        draw_line(&Line::new(&p4_b, &p1_b), image, color.clone());
 
-        draw_line(&Line::new(&p2, &p5), image, color.clone());
-        draw_line(&Line::new(&p1, &p6), image, color.clone());
-        draw_line(&Line::new(&p4, &p7), image, color.clone());
-        draw_line(&Line::new(&p3, &p8), image, color.clone());
+        draw_line(&Line::new(&p1, &p1_b), image, color.clone());
+        draw_line(&Line::new(&p2, &p2_b), image, color.clone());
+        draw_line(&Line::new(&p3, &p3_b), image, color.clone());
+        draw_line(&Line::new(&p4, &p4_b), image, color.clone());
     }
 }
