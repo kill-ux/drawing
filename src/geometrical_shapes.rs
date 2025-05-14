@@ -25,7 +25,7 @@ pub struct Point {
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Self {
-        Point { x, y }
+        Self { x, y }
     }
 
     pub fn random(width: i32, height: i32) -> Self {
@@ -63,8 +63,7 @@ impl Line {
 
 impl Drawable for Line {
     fn draw(&self, image: &mut Image) {
-        let color = self.color();
-        draw_line(self, image, color.clone());
+        draw_line(self, image, self.color());
     }
 }
 
@@ -79,26 +78,17 @@ fn draw_line(line: &Line, image: &mut Image, color: Color) {
     let sx = if x0 < x1 { 1 } else { -1 };
     let sy = if y0 < y1 { 1 } else { -1 };
 
-    let mut x = x0;
-    let mut y = y0;
-    let mut range = if dx > dy { dx } else { -dy } / 2;
-    let mut range_prev;
-    loop {
-        image.display(x, y, color.clone());
-        if x == x1 && y == y1 {
-            break;
-        }
+    let mut x = x0 as f32;
+    let mut y = y0 as f32;
 
-        range_prev = range;
-        if range_prev > -dx {
-            range -= dy;
-            x += sx;
-        }
+    let steps = dx.max(dy);
+    let x_inc = (dx as f32 / steps as f32) * sx as f32;
+    let y_inc = (dy as f32 / steps as f32) * sy as f32;
 
-        if range_prev < dy {
-            range += dx;
-            y += sy;
-        }
+    for _ in 0..steps {
+        image.display(x.round() as i32, y.round() as i32, color.clone());
+        x += x_inc;
+        y += y_inc;
     }
 }
 
@@ -218,34 +208,23 @@ impl Pentagon {
         )
     }
 }
-
 impl Drawable for Pentagon {
     fn draw(&self, image: &mut Image) {
-        let mut deta = 54.0;
-        let ang_intial = (deta * std::f64::consts::PI / 180.0) as f32;
-        let mut last_x =
-            ((self.radius as f32) * ang_intial.cos() + self.center.x as f32).round() as i32;
-        let mut last_y =
-            ((self.radius as f32) * ang_intial.sin() + self.center.y as f32).round() as i32;
+        let mut last_x = self.radius + self.center.x;
+        let mut last_y = self.center.y;
         let color = self.color();
-        for _i in 0..5 {
-            deta += 72.0;
+        for i in 1..=5 {
             let last_point = Point::new(last_x, last_y);
-            let ang = (deta as f64) * std::f64::consts::PI / 180.0;
-            let x = ((self.radius as f64) * ang.cos() + self.center.x as f64).round() as i32;
-            let y = ((self.radius as f64) * ang.sin() + self.center.y as f64).round() as i32;
+            let angle = ((i as f64 * (360.0 / 5.0)) * std::f64::consts::PI / 180.0) as f32;
+            let x = ((self.radius as f32 * angle.cos()) + self.center.x as f32).floor() as i32;
+            let y = ((self.radius as f32 * angle.sin()) + self.center.y as f32).floor() as i32;
             last_x = x;
             last_y = y;
-            draw_line(
-                &Line::new(&last_point, &Point::new(x, y)),
-                image,
-                color.clone(),
-            );
+            let line = Line::new(&last_point, &Point::new(x, y));
+            draw_line(&line, image, color.clone());
         }
     }
 }
-
-
 
 pub struct Cube {
     point1: Point,
@@ -263,45 +242,49 @@ impl Cube {
 
 impl Drawable for Cube {
     fn draw(&self, image: &mut Image) {
-        let r = (self.point1.x - self.point2.x).abs()/2;
-        let _ang = std::f64::consts::PI/4.0;
-        let p1 = Point {
+        let d = ((self.point2.x - self.point1.x).abs()) / 3;
+        let p1: Point = Point {
             x: self.point1.x,
             y: self.point2.y,
         };
-        let p2 = Point {
+        let p2 = &self.point2;
+        let p3 = Point {
             x: self.point2.x,
             y: self.point1.y,
         };
-        let a1 = Point{
-            x : p1.x+r,
-            y: p1.y+r,
+        let p4 = &self.point1;
+
+        let p5: Point = Point {
+            x: self.point2.x + d,
+            y: self.point2.y - d,
         };
-        let a2 = Point{
-            x : p2.x+r,
-            y: p2.y+r,
+        let p6 = Point {
+            x: p1.x + d,
+            y: p1.y - d,
         };
-        let a3 = Point{
-            x : self.point1.x+r,
-            y: self.point1.y+r,
+        let p7 = Point {
+            x: self.point1.x + d,
+            y: self.point1.y - d,
         };
-        let a4 = Point{
-            x : self.point2.x+r,
-            y: self.point2.y+r,
+        let p8 = Point {
+            x: p3.x + d,
+            y: p3.y - d,
         };
 
         let color = self.color();
-        draw_line(&Line::new(&p1, &self.point2), image, color.clone());
-        draw_line(&Line::new(&self.point2, &p2), image, color.clone());
-        draw_line(&Line::new(&p2, &self.point1), image, color.clone());
-        draw_line(&Line::new(&self.point1, &p1), image, color.clone());
-        draw_line(&Line::new(&p1,&a1),image,color.clone());
-        draw_line(&Line::new(&p2,&a2),image,color.clone());
-        draw_line(&Line::new( &self.point1,&a3),image,color.clone());
-        draw_line(&Line::new( &self.point2,&a4),image,color.clone());
-        draw_line(&Line::new(&a3,&a1),image,color.clone());
-        draw_line(&Line::new(&a4,&a2),image,color.clone());
-        draw_line(&Line::new(&a4,&a1),image,color.clone());
-        draw_line(&Line::new(&a3,&a2),image,color.clone());
+        draw_line(&Line::new(&p1, &p2), image, color.clone());
+        draw_line(&Line::new(&p2, &p3), image, color.clone());
+        draw_line(&Line::new(&p3, &p4), image, color.clone());
+        draw_line(&Line::new(&p4, &p1), image, color.clone());
+
+        draw_line(&Line::new(&p5, &p6), image, color.clone());
+        draw_line(&Line::new(&p6, &p7), image, color.clone());
+        draw_line(&Line::new(&p7, &p8), image, color.clone());
+        draw_line(&Line::new(&p8, &p5), image, color.clone());
+
+        draw_line(&Line::new(&p2, &p5), image, color.clone());
+        draw_line(&Line::new(&p1, &p6), image, color.clone());
+        draw_line(&Line::new(&p4, &p7), image, color.clone());
+        draw_line(&Line::new(&p3, &p8), image, color.clone());
     }
 }
