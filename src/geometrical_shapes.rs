@@ -78,14 +78,14 @@ fn draw_line(line: &Line, image: &mut Image, color: Color) {
     let sx = if line.end.x < line.start.x { -1.0 } else { 1.0 };
     let sy = if line.end.y < line.start.y { -1.0 } else { 1.0 };
 
+    let x_inc = (dx as f32 / steps as f32) * sx;
+    let y_inc = (dy as f32 / steps as f32) * sy;
+
     let color = line.color();
     for _ in 0..steps {
         image.display(x.round() as i32, y.round() as i32, color.clone());
-
-        x += (dx as f32 / steps as f32) * sx;
-        y += (dy as f32 / steps as f32) * sy;
-        // println!("gg {}", x);
-        // println!("{}", y);
+        x += x_inc;
+        y += y_inc;
     }
 }
 
