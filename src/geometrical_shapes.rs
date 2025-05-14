@@ -244,3 +244,37 @@ impl Drawable for Pentagon {
         }
     }
 }
+
+
+
+pub struct Cube {
+    point1: Point,
+    point2: Point,
+}
+
+impl Cube {
+    pub fn new(p1: &Point, p2: &Point) -> Self {
+        Self {
+            point1: p1.clone(),
+            point2: p2.clone(),
+        }
+    }
+}
+
+impl Drawable for Cube {
+    fn draw(&self, image: &mut Image) {
+        let p1 = Point {
+            x: self.point1.x,
+            y: self.point2.y,
+        };
+        let p2 = Point {
+            x: self.point2.x,
+            y: self.point1.y,
+        };
+        let color = self.color();
+        draw_line(&Line::new(&p1, &self.point2), image, color.clone());
+        draw_line(&Line::new(&self.point2, &p2), image, color.clone());
+        draw_line(&Line::new(&p2, &self.point1), image, color.clone());
+        draw_line(&Line::new(&self.point1, &p1), image, color.clone());
+    }
+}
