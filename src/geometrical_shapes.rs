@@ -68,29 +68,51 @@ impl Drawable for Line {
 }
 
 fn draw_line(line: &Line, image: &mut Image, color: Color) {
-    let x0 = line.start.x;
-    let y0 = line.start.y;
-    let x1 = line.end.x;
-    let y1 = line.end.y;
+    let mut x = line.start.x as f32;
+    let mut y = line.start.y as f32;
 
-    let dx = (x1 - x0).abs();
-    let dy = (y1 - y0).abs();
-    let sx = if x0 < x1 { 1 } else { -1 };
-    let sy = if y0 < y1 { 1 } else { -1 };
-
-    let mut x = x0 as f32;
-    let mut y = y0 as f32;
-
+    let dx = (line.end.x - line.start.x).abs();
+    let dy = (line.end.y - line.start.y).abs();
     let steps = dx.max(dy);
-    let x_inc = (dx as f32 / steps as f32) * sx as f32;
-    let y_inc = (dy as f32 / steps as f32) * sy as f32;
 
+    let sx = if line.end.x < line.start.x { -1.0 } else { 1.0 };
+    let sy = if line.end.y < line.start.y { -1.0 } else { 1.0 };
+
+    let color = line.color();
     for _ in 0..steps {
         image.display(x.round() as i32, y.round() as i32, color.clone());
-        x += x_inc;
-        y += y_inc;
+
+        x += (dx as f32 / steps as f32) * sx;
+        y += (dy as f32 / steps as f32) * sy;
+        // println!("gg {}", x);
+        // println!("{}", y);
     }
 }
+
+// fn draw_line(line: &Line, image: &mut Image, color: Color) {
+//     let x0 = line.start.x;
+//     let y0 = line.start.y;
+//     let x1 = line.end.x;
+//     let y1 = line.end.y;
+
+//     let dx = (x1 - x0).abs();
+//     let dy = (y1 - y0).abs();
+//     let sx = if x0 < x1 { 1 } else { -1 };
+//     let sy = if y0 < y1 { 1 } else { -1 };
+
+//     let mut x = x0 as f32;
+//     let mut y = y0 as f32;
+
+//     let steps = dx.max(dy);
+//     let x_inc = (dx as f32 / steps as f32) * sx as f32;
+//     let y_inc = (dy as f32 / steps as f32) * sy as f32;
+
+//     for _ in 0..steps {
+//         image.display(x.round() as i32, y.round() as i32, color.clone());
+//         x += x_inc;
+//         y += y_inc;
+//     }
+// }
 
 pub struct Triangle {
     p1: Point,
