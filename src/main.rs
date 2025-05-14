@@ -7,7 +7,7 @@ use raster::{Color, Image};
 fn main() {
     let mut image: Image = Image::blank(1000, 1000);
 
-    gs::Line::new(&Point::new(500, 500), &Point::new(50, -10)).draw(&mut image);
+    gs::Line::new(&Point::new(500, 500), &Point::new(200, 600)).draw(&mut image);
     gs::Line::random(1000, 1000).draw(&mut image);
     gs::Pentagon::random(1000, 1000);
 
