@@ -78,26 +78,17 @@ fn draw_line(line: &Line, image: &mut Image, color: Color) {
     let sx = if x0 < x1 { 1 } else { -1 };
     let sy = if y0 < y1 { 1 } else { -1 };
 
-    let mut x = x0;
-    let mut y = y0;
-    let mut range = if dx > dy { dx } else { -dy } / 2;
-    let mut range_prev;
-    loop {
-        image.display(x, y, color.clone());
-        if x == x1 && y == y1 {
-            break;
-        }
+    let mut x = x0 as f32;
+    let mut y = y0 as f32;
 
-        range_prev = range;
-        if range_prev > -dx {
-            range -= dy;
-            x += sx;
-        }
+    let steps = dx.max(dy);
+    let x_inc = (dx as f32 / steps as f32) * sx as f32;
+    let y_inc = (dy as f32 / steps as f32) * sy as f32;
 
-        if range_prev < dy {
-            range += dx;
-            y += sy;
-        }
+    for _ in 0..steps {
+        image.display(x.round() as i32, y.round() as i32, color.clone());
+        x += x_inc;
+        y += y_inc;
     }
 }
 
